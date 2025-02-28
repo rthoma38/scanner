@@ -3,7 +3,6 @@ pipeline {
     environment {
         SONAR_RUNNER_HOME = '/home/jenkins/sonar-scanner'
         PATH = "${SONAR_RUNNER_HOME}/bin:${env.PATH}"
-    }
         }
         stage('Vulnerability Scan') {
             steps {
