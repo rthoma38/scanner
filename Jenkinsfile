@@ -3,7 +3,9 @@ pipeline {
     environment {
         SONAR_RUNNER_HOME = '/home/jenkins/sonar-scanner'
         PATH = "${SONAR_RUNNER_HOME}/bin:${env.PATH}"
-        }
+    }
+
+    stages {
         stage('Vulnerability Scan') {
             steps {
                 sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image web-app'
