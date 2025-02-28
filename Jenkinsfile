@@ -14,11 +14,17 @@ pipeline {
         stage('Dynamic Vulnerability Scan with OWASP ZAP') {
             steps {
                 sh '''
-                docker run --name zap -u zap -p 8081:8081 -d zaproxy/zap zap.sh -daemon -port 8081
-                docker exec zap zap-full-scan.py -t http://127.0.0.1:5000 -r zap_report.html
-                docker cp zap:/zap/zap_report.html ./zap_report.html
-                docker stop zap
-                docker rm zap
+                # Start the local ZAP instance
+                C:/Users/rthom/OneDrive/Desktop/ZAP_WEEKLY/ZAP_D-2025-02-26/zap.sh -daemon -port 8081
+
+                # Wait for ZAP to start up (adjust the sleep time if necessary)
+                sleep 10
+
+                # Run the full scan
+                python C:/Users/rthom/OneDrive/Desktop/ZAP_WEEKLY/ZAP_D-2025-02-26/zap-full-scan.py -t http://127.0.0.1:5000 -r zap_report.html
+
+                # Stop the ZAP instance
+                C:/Users/rthom/OneDrive/Desktop/ZAP_WEEKLY/ZAP_D-2025-02-26/zap.sh -shutdown
                 '''
             }
         }
