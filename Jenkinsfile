@@ -3,35 +3,37 @@ pipeline {
     environment {
         SONAR_RUNNER_HOME = '/home/jenkins/sonar-scanner'
         PATH = "${SONAR_RUNNER_HOME}/bin:${env.PATH}"
+        ZAP_HOME = '/home/jenkins/ZAP_WEEKLY/ZAP_D-2025-02-26' // Path to ZAP installation
+        ZAP_API_KEY = '5n6finf2qiu7536fdleme108c6' // Replace with your actual API key
     }
 
     stages {
-        stage('Vulnerability Scan') {
+        stage('Vulnerability Scan - Trivy') {
             steps {
                 sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image web-app'
-            }
-        }
-        stage('Dynamic Vulnerability Scan with OWASP ZAP') {
-            steps {
-                sh '''
-                # Start the local ZAP instance
-                C:\\Users\\rthom\\OneDrive\\Desktop\\ZAP_WEEKLY\\ZAP_D-2025-02-26\\zap.sh -daemon -port 8081
-
-                # Wait for ZAP to start up (adjust the sleep time if necessary)
-                sleep 10
-
-                # Run the full scan
-                python C:\\Users\\rthom\\OneDrive\\Desktop\\ZAP_WEEKLY\\ZAP_D-2025-02-26\\zap-full-scan.py -t http://127.0.0.1:5000 -r zap_report.html
-
-                # Stop the ZAP instance
-                C:\\Users\\rthom\\OneDrive\\Desktop\\ZAP_WEEKLY\\ZAP_D-2025-02-26\\zap.sh -shutdown
-                '''
             }
         }
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube Scanner') {
                     sh 'sonar-scanner -Dsonar.projectKey=sonarqubeproject -Dsonar.sources=. -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONARQUBE_TOKEN'
+                }
+            }
+        }
+        stage('Dynamic Vulnerability Scan - OWASP ZAP') {
+            steps {
+                sh '''
+                    export ZAP_HOME=${ZAP_HOME}
+                    export PATH=${ZAP_HOME}:${PATH}
+                    ${ZAP_HOME}/zap.sh -daemon -host 127.0.0.1 -port 8081 -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true
+                    sleep 10 # Wait for ZAP to start
+                    ${ZAP_HOME}/zap-cli quick-scan --self-contained --start-options "-config api.key=${ZAP_API_KEY}" http://localhost:5000
+                    ${ZAP_HOME}/zap-cli report -o zap_report.html -f html
+                '''
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'zap_report.html', allowEmptyArchive: true
                 }
             }
         }
