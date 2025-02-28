@@ -10,18 +10,6 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/rthoma38/sonarqubedemo.git'
             }
         }
-        stage('Build') {
-            steps {
-                echo 'Building...'
-                // Add build steps if needed
-            }
-        }
-        stage('Test') {
-            steps {
-                echo 'Testing...'
-                // Add test steps if needed
-            }
-        }
         stage('Vulnerability Scan') {
             steps {
                 sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image web-app'
