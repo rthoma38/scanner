@@ -4,11 +4,6 @@ pipeline {
         SONAR_RUNNER_HOME = '/home/jenkins/sonar-scanner'
         PATH = "${SONAR_RUNNER_HOME}/bin:${env.PATH}"
     }
-    stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/rthoma38/sonarqubedemo.git'
-            }
         }
         stage('Vulnerability Scan') {
             steps {
