@@ -14,7 +14,7 @@ pipeline {
         stage('Dynamic Vulnerability Scan with OWASP ZAP') {
             steps {
                 sh '''
-                docker run --name zap -u zap -p 8080:8080 -d owasp/zap2docker-stable zap.sh -daemon -port 8080
+                docker run --name zap -u zap -p 8080:8080 -d zaproxy/zap2docker-stable zap.sh -daemon -port 8080
                 docker exec zap zap-full-scan.py -t http://localhost -r zap_report.html
                 docker cp zap:/zap/zap_report.html ./zap_report.html
                 docker stop zap
