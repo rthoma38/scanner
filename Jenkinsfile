@@ -10,7 +10,6 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 git branch: 'main', url: 'https://github.com/rthoma38/scanner.git'
-
             }
         }
         stage('Install Dependencies') {
@@ -19,22 +18,18 @@ pipeline {
                     python3 -m venv venv
                     . venv/bin/activate
                     pip install python-owasp-zap-v2.4
-                    pip install pytest pytest-cov
                 '''
             }
-       }
-        stage('Run Tests') {
+        }
+        stage('Vulnerability Scan - Trivy') {
             steps {
-                sh '''
-                    . venv/bin/activate
-                    pytest --cov=prime --cov-report=xml
-                '''
+                sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image web-app'
             }
         }
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube Scanner') {
-                    sh 'sonar-scanner -Dsonar.projectKey=sonarqubeproject -Dsonar.sources=prime.py -Dsonar.exclusions=venv/** -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONARQUBE_TOKEN -Dsonar.python.coverage.reportPaths=coverage.xml'
+                    sh 'sonar-scanner -Dsonar.projectKey=sonarqubeproject -Dsonar.sources=. -Dsonar.exclusions=venv/** -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONARQUBE_TOKEN'
                 }
             }
         }
