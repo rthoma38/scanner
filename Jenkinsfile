@@ -3,11 +3,15 @@ pipeline {
     environment {
         SONAR_RUNNER_HOME = '/home/jenkins/sonar-scanner'
         PATH = "${SONAR_RUNNER_HOME}/bin:${env.PATH}"
-        ZAP_HOME = '/home/jenkins/ZAP_WEEKLY/ZAP_D-2025-02-26' // Path to ZAP installation
         ZAP_API_KEY = 'd5ddjm5792pkroqp9pijvvioul' // Replace with your actual API key
     }
 
     stages {
+        stage('Clone Repository') {
+            steps {
+                git 'https://github.com/your-username/your-repository.git'
+            }
+        }
         stage('Vulnerability Scan - Trivy') {
             steps {
                 sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image web-app'
@@ -22,14 +26,7 @@ pipeline {
         }
         stage('Dynamic Vulnerability Scan - OWASP ZAP') {
             steps {
-                sh '''
-                    export ZAP_HOME=${ZAP_HOME}
-                    export PATH=${ZAP_HOME}:${PATH}
-                    ${ZAP_HOME}/zap.sh -daemon -host 127.0.0.1 -port 8081 -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true
-                    sleep 10 # Wait for ZAP to start
-                    ${ZAP_HOME}/zap-cli quick-scan --self-contained --start-options "-config api.key=${ZAP_API_KEY}" http://127.0.0.1:5000
-                    ${ZAP_HOME}/zap-cli report -o zap_report.html -f html
-                '''
+                sh 'python3 zap_scan.py'
             }
             post {
                 always {
