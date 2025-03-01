@@ -12,6 +12,11 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/rthoma38/scanner.git'
             }
         }
+        stage('Install Dependencies') {
+            steps {
+                sh 'pip3 install python-owasp-zap-v2.4'
+            }
+        }
         stage('Vulnerability Scan - Trivy') {
             steps {
                 sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image web-app'
