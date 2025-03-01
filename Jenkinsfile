@@ -20,6 +20,7 @@ pipeline {
                     pip install python-owasp-zap-v2.4
                 '''
             }
+        } 
         stage('Vulnerability Scan - Trivy') {
             steps {
                 sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image web-app'
