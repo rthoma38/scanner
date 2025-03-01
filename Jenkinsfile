@@ -4,7 +4,7 @@ pipeline {
         SONAR_RUNNER_HOME = '/home/jenkins/sonar-scanner'
         PATH = "${SONAR_RUNNER_HOME}/bin:${env.PATH}"
         ZAP_HOME = '/home/jenkins/ZAP_WEEKLY/ZAP_D-2025-02-26' // Path to ZAP installation
-        ZAP_API_KEY = '5n6finf2qiu7536fdleme108c6' // Replace with your actual API key
+        ZAP_API_KEY = 'd5ddjm5792pkroqp9pijvvioul' // Replace with your actual API key
     }
 
     stages {
