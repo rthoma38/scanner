@@ -27,7 +27,7 @@ pipeline {
                     export PATH=${ZAP_HOME}:${PATH}
                     ${ZAP_HOME}/zap.sh -daemon -host 127.0.0.1 -port 8081 -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true
                     sleep 10 # Wait for ZAP to start
-                    ${ZAP_HOME}/zap-cli quick-scan --self-contained --start-options "-config api.key=${ZAP_API_KEY}" http://localhost:5000
+                    ${ZAP_HOME}/zap-cli quick-scan --self-contained --start-options "-config api.key=${ZAP_API_KEY}" http://127.0.0.1:5000
                     ${ZAP_HOME}/zap-cli report -o zap_report.html -f html
                 '''
             }
