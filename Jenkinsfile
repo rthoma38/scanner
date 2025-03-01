@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/your-username/your-repository.git'
+                git 'https://github.com/rthoma38/scanner.git'
             }
         }
         stage('Vulnerability Scan - Trivy') {
