@@ -1,4 +1,4 @@
-  GNU nano 7.2                          generate_network_activity.py                                    import pandas as pd
+import pandas as pd
 import numpy as np
 
 # Set the random seed for reproducibility
