@@ -9,7 +9,7 @@ zap = ZAPv2(apikey=api_key, proxies={'http': 'http://127.0.0.1:8081', 'https': '
 time.sleep(10)
 
 # Start a scan
-target = 'http://example.com'  # Replace with your target URL
+target = 'http://127.0.0.1:5000'  # Replace with your target URL
 print(f'Starting scan on target {target}')
 zap.urlopen(target)  # Access the target URL
 scan_id = zap.ascan.scan(target)
