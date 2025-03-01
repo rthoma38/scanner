@@ -1,38 +1,33 @@
-pipeline {
-    agent any
-    environment {
-        SONAR_RUNNER_HOME = '/home/jenkins/sonar-scanner'
-        PATH = "${SONAR_RUNNER_HOME}/bin:${env.PATH}"
-        ZAP_API_KEY = 'd5ddjm5792pkroqp9pijvvioul' // Replace with your actual API key
-    }
+import os
+import time
+from zapv2 import ZAPv2
 
-    stages {
-        stage('Clone Repository') {
-            steps {
-                git 'https://github.com/your-username/your-repository.git'
-            }
-        }
-        stage('Vulnerability Scan - Trivy') {
-            steps {
-                sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image web-app'
-            }
-        }
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube Scanner') {
-                    sh 'sonar-scanner -Dsonar.projectKey=sonarqubeproject -Dsonar.sources=. -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONARQUBE_TOKEN'
-                }
-            }
-        }
-        stage('Dynamic Vulnerability Scan - OWASP ZAP') {
-            steps {
-                sh 'python3 zap_scan.py'
-            }
-            post {
-                always {
-                    archiveArtifacts artifacts: 'zap_report.html', allowEmptyArchive: true
-                }
-            }
-        }
-    }
-}
+api_key = os.getenv('ZAP_API_KEY')  # Get the API key from the environment variable
+zap = ZAPv2(apikey=api_key, proxies={'http': 'http://127.0.0.1:8081', 'https': 'http://127.0.0.1:8081'})
+
+# Ensure ZAP is ready
+time.sleep(10)
+
+# Start a scan
+target = 'http://example.com'  # Replace with your target URL
+print(f'Starting scan on target {target}')
+zap.urlopen(target)  # Access the target URL
+scan_id = zap.ascan.scan(target)
+
+# Poll the status until it completes
+while int(zap.ascan.status(scan_id)) < 100:
+    print(f'Scan progress: {zap.ascan.status(scan_id)}%')
+    time.sleep(5)
+
+print('Scan completed')
+
+# Generate the report
+report = zap.core.htmlreport()
+
+# Debugging: Print the report length
+print(f'Report length: {len(report)}')
+
+# Save the report
+with open('zap_report.html', 'w') as report_file:
+    report_file.write(report)
+print('Report generated: zap_report.html')
