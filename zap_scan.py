@@ -1,10 +1,15 @@
-api_key = 'd5ddjm5792pkroqp9pijvvioul'  # Replace with your actual ZAP API key
+import os
+import time
+from zapv2 import ZAPv2
+
+api_key = os.getenv('ZAP_API_KEY')  # Get the API key from the environment variable
 zap = ZAPv2(apikey=api_key, proxies={'http': 'http://127.0.0.1:8081', 'https': 'http://127.0.0.1:8081'})
 
 # Ensure ZAP is ready
 time.sleep(10)
 
 # Start a scan
+target = 'http://example.com'  # Replace with your target URL
 print(f'Starting scan on target {target}')
 zap.urlopen(target)  # Access the target URL
 scan_id = zap.ascan.scan(target)
