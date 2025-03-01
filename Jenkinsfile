@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/rthoma38/my_sonar_project.git'
+                git branch: 'main', url: 'https://github.com/rthoma38/scanner.git'
             }
         }
         stage('Install Dependencies') {
