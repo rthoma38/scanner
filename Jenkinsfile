@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/rthoma38/scanner.git'
+                git branch: 'main', url: 'https://github.com/your-repo.git'
             }
         }
         stage('Install Dependencies') {
@@ -17,14 +17,30 @@ pipeline {
                 sh '''
                     python3 -m venv venv
                     . venv/bin/activate
-                    pip install python-owasp-zap-v2.4
+                    pip install -r requirements.txt
+                '''
+            }
+        }
+        stage('Train Model') {
+            steps {
+                sh '''
+                    . venv/bin/activate
+                    python train_model.py
+                '''
+            }
+        }
+        stage('Deploy Model') {
+            steps {
+                sh '''
+                    . venv/bin/activate
+                    python deploy_model.py
                 '''
             }
         }
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube Scanner') {
-                    sh 'sonar-scanner -Dsonar.projectKey=SonarQube_Analysis -Dsonar.sources=. -Dsonar.exclusions=venv/** -Dsonar.host.url=http://localhost:9000 -Dsonar.login=${SONARQUBE_TOKEN}'
+                    sh 'sonar-scanner -Dsonar.projectKey=sonarqubeproject -Dsonar.sources=. -Dsonar.exclusions=venv/** -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONARQUBE_TOKEN'
                 }
             }
         }
@@ -48,4 +64,3 @@ pipeline {
         }
     }
 }
-
