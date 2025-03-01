@@ -34,7 +34,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube Scanner') {
-                    sh 'sonar-scanner -Dsonar.projectKey=sonarqubeproject -Dsonar.sources=zap_scan.py,prime.py -Dsonar.exclusions=venv/** -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONARQUBE_TOKEN -Dsonar.python.coverage.reportPaths=coverage.xml'
+                    sh 'sonar-scanner -Dsonar.projectKey=sonarqubeproject -Dsonar.sources=prime.py -Dsonar.exclusions=venv/** -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONARQUBE_TOKEN -Dsonar.python.coverage.reportPaths=coverage.xml'
                 }
             }
         }
