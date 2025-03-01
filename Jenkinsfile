@@ -22,12 +22,12 @@ pipeline {
                     pip install pytest pytest-cov
                 '''
             }
-        }
+       }
         stage('Run Tests') {
             steps {
                 sh '''
                     . venv/bin/activate
-                    pytest --cov=zap_scan.py --cov=prime.py --cov-report=xml
+                    pytest --cov=prime --cov-report=xml
                 '''
             }
         }
