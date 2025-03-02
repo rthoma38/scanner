@@ -14,8 +14,10 @@ pipeline {
          }
         stage('Fix Feature Names') {
             steps {
+                sh '''
                 . venv/bin/activate
-                sh 'python fix_feature_names.py'
+                python fix_feature_names.py
+                '''
             }
         }
         stage('Install Dependencies') {
