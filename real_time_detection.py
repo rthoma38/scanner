@@ -1,4 +1,4 @@
-  GNU nano 7.2                             real_time_detection.py                                       import joblib
+import joblib
 import pandas as pd
 
 # Load the model
