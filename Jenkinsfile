@@ -11,6 +11,11 @@ pipeline {
             steps {
                 git branch: 'main', url: 'https://github.com/rthoma38/scanner.git'
             }
+         }
+        stage('Fix Feature Names') {
+            steps {
+                sh 'python fix_feature_names.py'
+            }
         }
         stage('Install Dependencies') {
             steps {
