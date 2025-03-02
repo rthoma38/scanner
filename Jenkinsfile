@@ -12,7 +12,7 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/rthoma38/scanner.git'
             }
         }
-
+        
         stage('Install Dependencies') {
             steps {
                 dir('anomaly_detection') {
@@ -24,16 +24,64 @@ pipeline {
                 }
             }
         }
+        
+        stage('Setup') {
+            steps {
+                script {
+                    // Set up virtual environment
+                    sh '''
+                        cd anomaly_detection
+                        python3 -m venv venv
+                        . venv/bin/activate
+                        pip install --upgrade pip
+                        pip install -r requirements.txt
+                    '''
+                }
+            }
+        }
+        
+        stage('Lint') {
+            steps {
+                sh '''
+                    cd anomaly_detection
+                    . venv/bin/activate
+                    flake8 .
+                '''
+            }
+        }
 
         stage('SonarQube Analysis') {
             steps {
-                    withSonarQubeEnv('SonarQube Scanner') {
-                        sh 'sonar-scanner -Dsonar.projectKey=SonarQube_Analysis -Dsonar.sources=. -Dsonar.exclusions=venv/** -Dsonar.host.url=http://localhost:9000 -Dsonar.login=${SONARQUBE_TOKEN}'
-                    }
+                withSonarQubeEnv('SonarQube Scanner') {
+                    sh '''
+                        cd anomaly_detection
+                        sonar-scanner -Dsonar.projectKey=SonarQube_Analysis -Dsonar.sources=. -Dsonar.exclusions=venv/** -Dsonar.host.url=http://localhost:9000 -Dsonar.login=${SONARQUBE_TOKEN}'
+                    '''
                 }
             }
         }
 
+        stage('Test') {
+            steps {
+                sh '''
+                    cd anomaly_detection
+                    . venv/bin/activate
+                    pytest
+                '''
+            }
+        }
+        
+        stage('Build and Deploy') {
+            steps {
+                sh '''
+                    cd anomaly_detection
+                    . venv/bin/activate
+                    python tensorflow/train_anomaly_detection_model.py
+                    python tensorflow/deploy_anomaly_detection_api.py
+                '''
+            }
+        }
+        
         stage('Dynamic Vulnerability Scan - OWASP ZAP') {
             steps {
                 dir('anomaly_detection') {
@@ -49,67 +97,17 @@ pipeline {
                 }
             }
         }
-
+        
         stage('Vulnerability Scan - Trivy') {
             steps {
-                    sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image web-app'
-                }
+                sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image web-app'
             }
         }
-
-        stage('Data Collection') {
-            steps {
-                dir('anomaly_detection') {
-                    sh '''
-                        . venv/bin/activate
-                        python3 collect_network_data.py --interface eth0 --output-file network_data.pcap --packet-count 1000
-                    '''
-                }
-            }
-        }
-
-        stage('Train Model') {
-            steps {
-                dir('anomaly_detection') {
-                    sh '''
-                        . venv/bin/activate
-                        python3 train_model.py
-                    '''
-                }
-            }
-        }
-
-        stage('Save Model') {
-            steps {
-                dir('anomaly_detection') {
-                    sh '''
-                        . venv/bin/activate
-                        python3 save_model.py
-                    '''
-                }
-            }
-        }
-
-        stage('Deploy Model') {
-            steps {
-                dir('anomaly_detection') {
-                    sh '''
-                        . venv/bin/activate
-                        python3 app.py
-                    '''
-                }
-            }
-        }
-
-        stage('Test Model') {
-            steps {
-                dir('anomaly_detection') {
-                    sh '''
-                        . venv/bin/activate
-                        python3 test_model.py
-                    '''
-                }
-            }
+    }
+    post {
+        always {
+            archiveArtifacts artifacts: '**/*.html', allowEmptyArchive: true
+            junit 'test-reports/**/*.xml'
         }
     }
 }
