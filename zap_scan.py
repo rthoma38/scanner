@@ -14,17 +14,32 @@ zap.core.new_session(name='new_session', overwrite=True)
 target = 'http://127.0.0.1:5000'  # Replace with your actual target URL
 print(f'Starting scan on target {target}')
 zap.urlopen(target)  # Access the target URL
-scan_id = zap.ascan.scan(target)
 
-while int(zap.ascan.status(scan_id)) < 100:
-    print(f'Scan progress: {zap.ascan.status(scan_id)}%')
+scan_id = zap.ascan.scan(target)
+if not scan_id or scan_id == 'does_not_exist':
+    print("Failed to start scan or invalid scan_id.")
+    exit(1)
+
+print(f"Scan ID: {scan_id}")
+
+while True:
+    scan_status = zap.ascan.status(scan_id)
+    if scan_status == 'does_not_exist':
+        print("Scan ID does not exist.")
+        exit(1)
+    
+    try:
+        scan_progress = int(scan_status)
+    except ValueError as e:
+        print(f"Error converting scan status to int: {e}")
+        exit(1)
+    
+    print(f'Scan progress: {scan_progress}%')
+    if scan_progress >= 100:
+        break
     time.sleep(5)
 
 print('Scan completed')
 
 report = zap.core.htmlreport()
 print(f'Report length: {len(report)}')
-
-with open('zap_report.html', 'w') as report_file:
-    report_file.write(report)
-print('Report generated: zap_report.html')
