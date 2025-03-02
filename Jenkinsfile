@@ -63,9 +63,8 @@ pipeline {
             steps {
                 dir('anomaly_detection') {
                     sh '''
-                        sudo tcpdump -i eth0 -c 1000 -w network_data.pcap
                         . venv/bin/activate
-                        python3 process_data.py
+                        python3 collect_network_data.py --interface eth0 --output-file network_data.pcap --packet-count 1000
                     '''
                 }
             }
@@ -98,7 +97,7 @@ pipeline {
                 dir('anomaly_detection') {
                     sh '''
                         . venv/bin/activate
-                        python3 deploy_model.py
+                        python3 app.py
                     '''
                 }
             }
