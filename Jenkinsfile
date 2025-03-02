@@ -11,6 +11,7 @@ pipeline {
             steps {
                 git branch: 'main', url: 'https://github.com/rthoma38/scanner.git'
             }
+        }
 
         stage('SonarQube Analysis') {
             steps {
@@ -20,6 +21,7 @@ pipeline {
                     '''
                 }
             }
+        }
 
         stage('Build and Deploy') {
             steps {
