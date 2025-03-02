@@ -13,6 +13,19 @@ pipeline {
             }
         }
 
+        stage('Install Dependencies') {
+            steps {
+                dir('anomaly_detection') {
+                    sh '''
+                        python3 -m venv venv
+                        . venv/bin/activate
+                        pip install --upgrade pip
+                        pip install -r requirements.txt
+                    '''
+                }
+            }
+        }
+
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube Scanner') {
@@ -25,12 +38,16 @@ pipeline {
 
         stage('Build and Deploy') {
             steps {
-                sh '''
-                    cd tensorflow
-                    . venv/bin/activate
-                    python tensorflow/train_anomaly_detection_model.py
-                    python tensorflow/deploy_anomaly_detection_api.py
-                '''
+                dir('tensorflow') {
+                    sh '''
+                        python3 -m venv venv
+                        . venv/bin/activate
+                        pip install --upgrade pip
+                        pip install -r ../anomaly_detection/requirements.txt
+                        python train_anomaly_detection_model.py
+                        python deploy_anomaly_detection_api.py
+                    '''
+                }
             }
         }
 
