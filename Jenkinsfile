@@ -11,21 +11,13 @@ pipeline {
             steps {
                 git branch: 'main', url: 'https://github.com/rthoma38/scanner.git'
             }
-         }
-        stage('Fix Feature Names') {
-            steps {
-                sh '''
-                . venv/bin/activate
-                python fix_feature_names.py
-                '''
-            }
         }
         stage('Install Dependencies') {
             steps {
                 sh '''
                     python3 -m venv venv
                     . venv/bin/activate
-                    pip install python-owasp-zap-v2.4 scikit-learn pandas numpy joblib
+                    pip install python-owasp-zap-v2.4
                 '''
             }
         }
@@ -54,29 +46,6 @@ pipeline {
                 sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image web-app'
             }
         }
-        stage('Generate Dataset') {
-            steps {
-                sh '''
-                    . venv/bin/activate
-                    python generate_network_activity.py
-                '''
-            }
-        }
-        stage('Train Model') {
-            steps {
-                sh '''
-                    . venv/bin/activate
-                    python train_model.py
-                '''
-            }
-        }
-        stage('Real-time Detection') {
-            steps {
-                sh '''
-                    . venv/bin/activate
-                    python real_time_detection.py
-                '''
-            }
-        }
     }
 }
+
