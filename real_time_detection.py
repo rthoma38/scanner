@@ -2,7 +2,7 @@ import joblib
 import pandas as pd
 
 # Load the model
-model = joblib.load('anomaly_detection_model.pkl')
+model = joblib.load('model.pkl')
 
 def detect_anomalies(new_data):
     # Predict anomalies
