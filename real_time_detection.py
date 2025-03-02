@@ -10,6 +10,6 @@ def detect_anomalies(new_data):
     return predictions
 
 # Example usage
-new_data = pd.read_csv('new_network_activity.csv')
+new_data = pd.read_csv('network_traffic.csv')
 anomalies = detect_anomalies(new_data)
 print(anomalies)
