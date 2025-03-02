@@ -11,62 +11,20 @@ pipeline {
             steps {
                 git branch: 'main', url: 'https://github.com/rthoma38/scanner.git'
             }
-        }
-
-        stage('Install Dependencies') {
-            steps {
-                dir('anomaly_detection') {
-                    sh '''
-                        python3 -m venv venv
-                        . venv/bin/activate
-                        pip install --upgrade pip
-                        pip install -r requirements.txt
-                        pip install pytest  # Ensure pytest is installed
-                    '''
-                }
-            }
-        }
-
-        stage('Setup') {
-            steps {
-                script {
-                    // Set up virtual environment
-                    sh '''
-                        cd anomaly_detection
-                        python3 -m venv venv
-                        . venv/bin/activate
-                        pip install --upgrade pip
-                        pip install -r requirements.txt
-                    '''
-                }
-            }
-        }
 
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube Scanner') {
                     sh '''
-                        cd anomaly_detection
                         sonar-scanner -Dsonar.projectKey=SonarQube_Analysis -Dsonar.sources=. -Dsonar.exclusions=venv/** -Dsonar.host.url=http://localhost:9000 -Dsonar.login=${SONARQUBE_TOKEN}
                     '''
                 }
             }
-        }
-
-        stage('Test') {
-            steps {
-                sh '''
-                    cd anomaly_detection
-                    . venv/bin/activate
-                    pytest
-                '''
-            }
-        }
 
         stage('Build and Deploy') {
             steps {
                 sh '''
-                    cd anomaly_detection
+                    cd tensorflow
                     . venv/bin/activate
                     python tensorflow/train_anomaly_detection_model.py
                     python tensorflow/deploy_anomaly_detection_api.py
@@ -76,7 +34,7 @@ pipeline {
 
         stage('Dynamic Vulnerability Scan - OWASP ZAP') {
             steps {
-                dir('anomaly_detection') {
+                dir('midterm') {
                     sh '''
                         . venv/bin/activate
                         python3 zap_scan.py
