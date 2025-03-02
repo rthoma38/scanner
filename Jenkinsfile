@@ -64,7 +64,7 @@ pipeline {
                 dir('anomaly_detection') {
                     sh '''
                         . venv/bin/activate
-                        python3 collect_network_data.py
+                        python3 collect_network_data.py --interface eth0 --output-file network_data.pcap --packet-count 1000
                     '''
                 }
             }
