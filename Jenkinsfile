@@ -15,7 +15,7 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                dir('anomaly_detection') {
+                dir('tensorflow') {
                     sh '''
                         python3 -m venv venv
                         . venv/bin/activate
