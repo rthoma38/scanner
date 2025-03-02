@@ -32,4 +32,4 @@ data = pd.DataFrame({
 })
 
 # Save the DataFrame to a CSV file
-data.to_csv('network_activity.csv', index=False)
+data.to_csv('network_traffic.csv', index=False)
