@@ -27,7 +27,6 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                dir('anomaly_detection') {
                     withSonarQubeEnv('SonarQube Scanner') {
                         sh 'sonar-scanner -Dsonar.projectKey=SonarQube_Analysis -Dsonar.sources=. -Dsonar.exclusions=venv/** -Dsonar.host.url=http://localhost:9000 -Dsonar.login=${SONARQUBE_TOKEN}'
                     }
@@ -53,7 +52,6 @@ pipeline {
 
         stage('Vulnerability Scan - Trivy') {
             steps {
-                dir('anomaly_detection') {
                     sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image web-app'
                 }
             }
