@@ -11,7 +11,7 @@ time.sleep(10)
 print("Starting a new session...")
 zap.core.new_session(name='new_session', overwrite=True)
 
-target = 'http://127.0.0.1:5000'  # Replace with your actual target URL
+target = 'http://127.0.0.1:8080'  # Replace with your actual target URL
 print(f'Starting scan on target {target}')
 zap.urlopen(target)  # Access the target URL
 
