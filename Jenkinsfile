@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         PYTHON_PATH = '/usr/bin'
-        SONAR_RUNNER_HOME = '/home/jenkins/sonar-scanner'
+        SONAR_RUNNER_HOME = '/opt/sonar-scanner'
         PATH = "${SONAR_RUNNER_HOME}/bin:${env.PATH}"
         ZAP_API_KEY = credentials('ZAP_API_KEY') // Use the credentials ID you set in Jenkins
     }
