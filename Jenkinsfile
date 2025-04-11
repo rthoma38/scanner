@@ -13,6 +13,7 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/rthoma38/scanner.git'
             }
         }
+        
         stage('Install Dependencies') {
             steps {
                 sh '''
@@ -22,13 +23,15 @@ pipeline {
                 '''
             }
         }
+
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube Scanner') {
-                    sh 'sonar-scanner -Dsonar.projectKey=SonarQube_Analysis -Dsonar.sources=. -Dsonar.exclusions=venv/** -Dsonar.host.url=http://localhost:9000 -Dsonar.login=${SONARQUBETOKEN}'
+                    sh 'sonar-scanner -Dsonar.projectKey=SonarQube_Analysis -Dsonar.sources=. -Dsonar.exclusions=venv/** -Dsonar.host.url=http://sonarqube:9000 -Dsonar.login=${SONARQUBETOKEN}'
                 }
             }
         }
+        
         stage('Dynamic Vulnerability Scan - OWASP ZAP') {
             steps {
                 sh '''
@@ -42,6 +45,7 @@ pipeline {
                 }
             }
         }    
+
         stage('Vulnerability Scan - Trivy') {
             steps {
                 sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image web-app'
